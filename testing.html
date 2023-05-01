@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style2.css">
+    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" referrerpolicy="no-referrer" />-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" referrerpolicy="no-referrer" />
+</head>
+<body style="background-color: black;">
+    <header>
+        <div class="navbar container">
+               <!--<div class="logo"><h1>xcent</h1></div>-->
+               <h1><div class="logo"><img src="Renti5 logo.PNG" alt="" style="width: 50%;padding-top: 10px; position:relative;"></div></h1>
+            <ul class="nav-list">
+                <li><a href="#">Subscribe</a></li>
+                <li><a href="#">Advertise</a></li>
+                <li><a href="#">Job/Internship</a></li>
+                <li><a href="#">Newsletter</a></li>
+                <li><a href="#">Blogs</a></li>
+            </ul>
+            <div class="menu">
+                <i class="fa fa-bars" style="color: white"></i>
+            </div>
+            <div class="mobile-nav">
+                <ul class="nav-list">
+                    <li><a href="#">Subscribe</a></li>
+                    <li><a href="#">Advertise</a></li>
+                    <li><a href="#">Job/Internship Openings</a></li>
+                    <li><a href="#">Newsletter</a></li>
+                    <li><a href="#">Blogs</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+       <br><br><br><br><br><br>
+        <div class="hero">
+            <!--<img src="cloud_wordcloud.png" alt="" width="50%" height="90%">-->
+            <main>
+                <h2>API Gateway x Lambda x DynamoDB x SNS</h2>
+                <div class="profile-container">
+                    <div class="profile">
+                        <div class="img-container">
+                            <img src="photo.jpg" alt="" height="100%" width="100%" style="border-radius: 0.5rem;"> 
+                        </div>
+                        <div class="text">
+                            <h3>Jay Shah</h3>
+                            <p>July 18 2023</p>
+                        </div>
+                    </div>
+                    <div class="button">
+                        <a href="#" class="btn">Author Details</a>
+                    </div>
+                </div>
+                <div class="content">
+                    <p style="margin-bottom:0;">The title of this blog explains which major AWS services are going to be used in this project.
+                        The explanation of this blog will be in a detailed manner but to avoid the TL;DR responses, here's
+                        the nutshell project description:We are hosting a static web page (index.html) using S3.</p>    
+                    
+                        <div class="content-img-container">  
+                            <img src="Architecture3.png" alt="Architecture3" height="100%" width="100%">
+                            <figcaption>Fig. Architecture</figcaption>
+                        </div>
+                    
+                        <p>It is a simple HTML form with 3 inputs: Name, Age, and Location. When submitting the data, 
+                            these details will be stored in our DynamoDB table which will generate an SNS(Simple Notification Service) notification
+                             and will send a response to my mailbox and a mobile SMS. The processing between the DynamoDB table and the web page for submitting 
+                             and storing the details is done by a Lambda function integrated with an edge-optimized REST API, whilst the processing between 
+                             DynamoDB table entries and the SNS topic is done by another Lambda function.A GitHub link to all the files is attached with their 
+                             respective file name and here is my repository link
+                            <br><a href="https://github.com/jay1299/DynamoDB-x-Lambda-x-APIgateway-x-S3-x-SNS">DynamoDB-x-Lambda-x-APIgateway-x-S3-x-SNS with ❤️ 🙌</a></br>
+                        </p>
+                       <!--  -->
+                    
+                       <h2>1. Setting up S3 Bucket with a static website hosting:</h2>
+                        <p>Set up an S3 bucket and allow public access to all the objects in the bucket.
+                            and upload the below 3 files into your bucket also once it has been uploaded, provide it public access for users to access it:</p>
+                        <p><a href="https://github.com/jay1299/DynamoDB-x-Lambda-x-APIgateway-x-S3-x-SNS/blob/main/error.html">1) error.html</a></p>
+                        <p><a href="https://github.com/jay1299/DynamoDB-x-Lambda-x-APIgateway-x-S3-x-SNS/blob/main/index.html">2) index.html</a></p>
+                        <p><a href="https://github.com/jay1299/DynamoDB-x-Lambda-x-APIgateway-x-S3-x-SNS/blob/main/ErrorEmoji.PNG">3) ErrorEmoji.PNG</a></p>
+                    
+                        <div class="content-img-container">
+                            <img src="1.PNG" alt="Architecture3" height="100%" width="100%">
+                            <figcaption>Fig 1. Making all bucket objects public</figcaption>
+                        </div>
+                         
+                        <p>Now, enable the static website hosting by clicking on properties on the same console(fig 1). 
+                            Once done, enter the index document and error document as below and save the changes.</p>
+                    
+                        <div class="content-img-container">
+                            <img src="s3.png" alt="s3" height="100%" width="100%">
+                            <figcaption>Fig 2. Static website hosting setup</figcaption>
+                        </div>
+                        
+                        <p>When you click on your static website endpoint, it should look like this;</p>
+                        <div class="content-img-container">
+                            <img src="2.PNG" alt="2" height="100%" width="100%">
+                            <figcaption>Fig 3. Website previews</figcaption>
+                        </div>
+                    
+                        <!-- -->
+                    
+                        <h2>2. Setting up the DynamoDB table:</h2>
+                        <p>Provide a name to your DynamoDB table and partition key as “ID”. 
+                            No need to provide a sort key. Leave all the other settings as it is and click on ‘create table’. 
+                            Copy the DynamoDB ARN which will be used while setting the IAM permission for the lambda functions. We need to enable DynamoDB streams for 
+                            this table in order to trigger a lambda function once any entry is made into the table which will in turn notify us about the entry 
+                            using the AWS SNS service</p>
+                        <p>The path for enabling it is: Search for your created table name → Exports and streams → DynamoDB stream details → Enable → Select new images → Enable stream.</p>
+                        <p>Lambda trigger setup will be done in further sections.</p>
+                    
+                        <!-- -->
+                    
+                        <h2>3. Setting up the Lambda function to fetch the details from the API gateway and store it in the DynamoDB table:</h2>
+                        <p>Create a Lambda function with runtime python 3.8 and copy the code from my GitHub repo file(Webpage to DynamoDB.py) Now, click on Configuration → Permissions → Click on
+                             Role name to set up the IAM permissions. Copy the DynamoDB full access.js file from GitHub Repo and paste it into the JSON editor as below.</p>
+                        <div class="content-img-container">
+                            <img src="4.PNG" alt="4" height="100%" width="100%">
+                            <figcaption>Fig 4. Lambda IAM role</figcaption>
+                        </div>
+                    
+                        <div class="content-img-container">
+                            <img src="DynamoDB full access.PNG" alt="4" height="100%" width="100%"
+                            <figcaption>Fig 5. DynamoDB full access JS file.</figcaption>
+                        </div>
+                    
+                        <p><b><i style="color:red;">Note: </i></b> Provide your DynamoDB table ARN in the resource section of the above JS file.</p>
+                        <p>Now, review the policy, provide any name to it and save it!</p>
+                    
+                        <!-- -->
+                    
+                        <h2>4. Setting up the API gateway:</h2>
+                        <p>A REST API is to be created to integrate our website with the DynamoDB table which will store the details processed by the Lambda function that we set up above.</p>
+                        <p>Go to API Gateway service → Create API → REST API(do not select pvt REST API option) → Build → provide an API name and select Endpoint Type as edge optimized</p>
+                        <p>Now from the Actions drop-down list create a POST method. Keep all the settings as it is(integration type: Lambda Function) and provide your lambda function name which you just created above. Make sure the Lambda Region is the same in which you created your function and click on save.
+                            Now again from the Actions drop-down list, click on enable CORS and just click on “Enable CORS and replace existing CORS headers”.
+                            Now we are ready to deploy our API 😉</p>
+                        <p>Click again on the Actions drop-down list(I swear, this would be the last time we are selecting the drop-down) and select deploy API, select Deployment stage as a new stage and provide a stage name, and hit Deploy!</p>
+                    
+                        <div class="content-img-container">
+                            <img src="5.PNG" alt="4" height="100%" width="100%">
+                            <figcaption>Fig 6. API Deployed</figcaption>
+                        </div>
+                    
+                        <p>Copy your Invoke URL and paste it into your S3’s index.html file’s fetch() method and re-upload your index.html file into S3.</p>
+                    
+                        <!-- -->
+                    
+                        <h2>5. Setting up the Lambda function that will be triggered by DynamoDB streams and will send notifications via SNS</h2>
+                        <p>Create a lambda function with a runtime JavaScript and paste the code from <a href="https://github.com/jay1299/DynamoDB-x-Lambda-x-APIgateway-x-S3-x-SNS/blob/main/DynamoDBtoSNS.js">DynamoDBtoSNS.js</a> into the index.js file. Provide the IAM permissions using the same process as we did above but now for the below 2 JavaScript files;
+                            <a href="https://github.com/jay1299/DynamoDB-x-Lambda-x-APIgateway-x-S3-x-SNS/blob/main/SNS%20permission.js">SNS permission.js</a> & <a href="https://github.com/jay1299/DynamoDB-x-Lambda-x-APIgateway-x-S3-x-SNS/blob/main/Streampermission.js">Streampermission.js</a></p>
+                    
+                        <p><b><i style="color:red;">Note: </i></b>Provide your DynamoDB table ARN in the resource section of the Streampermission.js file and SNS topic ARN(created in next step) in SNS permission.js file</p>
+                        <p>Now, go to DynamoDB and set up your Lambda trigger that we left in step 2.
+                            Create Trigger → Choose function → Select the recent 2nd lambda function that you just created and click Create trigger. Your Lambda function should now look something like this:</p>
+                    
+                        <div class="content-img-container">
+                            <img src="6.PNG" alt="4" height="100%" width="100%">
+                            <figcaption>Fig 7. Trigger and Destination setup for 2nd Lambda function</figcaption>
+                        </div>
+                    
+                        <!-- -->
+                        <h2>6. Setting up SNS topic with subscribers.</h2>
+                        <p>Create a Standard SNS topic and not FIFO, provide a name to it, and hit Create topic!
+                            Once created, copy the ARN from it and paste it to the 2nd lambda function code’s “TopicArn” section and click on the deploy option.</p>
+                        <p>Coming back to SNS, click on create subscriptions and select protocol as email and provide your endpoint(email address) and click on Create Subscriptions. Now you should receive a confirmation link on
+                             this email address. Confirm it and you are all set. You can even set up SMS as a subscription by providing your phone number and entering the OTP for confirmation. Once this is confirmed, your SNS console should look like this;</p>
+                    
+                        <div class="content-img-container">
+                            <img src="7.PNG" alt="4" height="100%" width="100%">
+                            <figcaption>Fig 8. SNS Subscription confirmation</figcaption>
+                        </div>
+                    
+                        <h1 style="color:white;">Congratulations! Your architecture has been set up! <img src="confetti.gif" style="max-width: 4%;align-items: center;"></h1>
+                        <blockquote>
+                            "This can be used as a note"
+                        </blockquote>
+                        <!-- -->
+                        <br></br>
+                        <h2>7. Testing process:</h2>
+                        <p>Go to your website and provide the data into the text boxes and hit Submit. You shall receive a response as “Hey, **Name you entered**. Your data has been saved and will be notified to you on your created SNS protocol :)”</p>
+                    
+                        <div class="content-img-container">
+                            <img src="8.PNG" alt="4" height="100%" width="100%">
+                            <figcaption>Fig 9. Response preview</figcaption>
+                        </div>
+                    
+                        <p>Meanwhile, you should have received a notification in your mailbox or mobile SMS, you can even check the data in your DynamoDB table.</p>
+                    
+                        <div class="content-img-container">
+                            <img src="9.PNG" alt="4" height="100%" width="100%">
+                            <figcaption>Fig 10. Data stored in DynamoDB table</figcaption>
+                        </div>
+                    
+                        <div class="content-img-container">
+                            <img src="11.PNG" alt="4" height="100%" width="100%">
+                            <figcaption>Fig 11. SNS mail received after hitting the Submit button</figcaption>
+                        </div>
+                    
+                        <p>if you like to modify anything in the index.html file then you can do it and as a verification step to check whether the S3 static website is hosted
+                             properly or not after your modifications, we did add an error.html file in step 1 which serves a purpose. When you have made an error in the index.html 
+                             file, you won’t be able to access it and instead the error.html file will be shown to you as below.</p>
+                    
+                        <div class="content-img-container">
+                            <img src="10.PNG" alt="4" height="100%" width="100%">
+                            <figcaption>Fig 12. Error.html file preview</figcaption>
+                        </div>
+                        
+                        <h2>Thanks for reading this article till the end :)<br>#KeepLearningKeepGrowing</h2>
+                        <br><h5 style="text-align: center;">© 2023 Technicus. All rights reserved.</h5>
+                </div>
+                <div class="tags">
+                    <p>tags:</p>
+                    <a href="#">#Web Design</a>
+                    <a href="#">#blogging</a>
+                </div>
+            </main>
+        </div>
+    </div>
+    <div class="articles">
+        <div class="articles-heading">
+            <!--<h5>articles</h5>-->
+            <h6>You might also like</h6>
+        </div>
+        <div class="wrapper2">
+            <div class="container2" id="container2">
+              <div class="box">
+                <img src="API blog.png" style="max-width: 100%;">
+                <h3>API Gateway x Lambda x DynamoDB x SNS</h3>
+                <p class="creation">18 July 2023 / Cloud</p>
+                <p>An AWS project to setup an API gateway that stores the provided inputs into DynamoDB table which uses streams to be processed
+                  by Lambda in order to send SNS messages to its subscribers</p>
+                <a href="#" style="float: left;" class="read-more">Read More</a>
+              </div>
+              <div class="box">
+                <img src="CloudQuestGame.png" style="max-width: 100%;">
+                <h3>AWS Cloud Quest game-For all budding cloud practitioners</h3>
+                <p class="creation">28 May 2022 / Cloud</p>
+                <p>I know that many of you would have thought of how a game as a support tool for learning would be. </p>
+                <a href="#" style="float: left;" class="read-more">Read More</a>
+              </div>
+              <div class="box">
+                <img src="Hebb_network.png" style="max-width: 100%;">
+                <h3>Hebb Network</h3>
+                <p class="creation">21 October  2020 / Soft Computing</p>
+                <p>Hebb or Hebbian learning rule comes under Artificial Neural Network (ANN) which is an architecture of a large number of 
+                  interconnected elements called neurons.</p>
+                <a href="#" style="float: left;" class="read-more">Read More</a>
+              </div> 
+            </div>
+          </div>
+        <!--
+            <div class="cards container">
+            <div class="cards-container one">
+                <div class="img-holder">
+                    <a href="#">View</a>
+                    <img src="Architecture3.png" alt="" height="100%" width="100%">
+                </div>
+                <div class="card-text">
+                    <h4>API Gateway x Lambda x DynamoDB x SNS</h4>
+                    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. 
+                        Asperiores praesentium cumque reprehenderit dolorum sapiente 
+                        expedita sint nostrum id. Quod harum alias cupiditate consequatur aut, 
+                        quia corporis recusandae quis sequi natus.
+                    </p>
+                </div>
+            </div>
+            <div class="cards-container two">   
+                <div class="img-holder">
+                    <a href="#">View</a>
+                    <img src="CloudQuestGame.png" alt="" height="100%" width="100%">
+                </div>
+                <div class="card-text">
+                    <h4>10 tips for drawing with colored</h4>
+                    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. 
+                        Asperiores praesentium cumque reprehenderit dolorum sapiente 
+                        expedita sint nostrum id. Quod harum alias cupiditate consequatur aut, 
+                        quia corporis recusandae quis sequi natus.
+                    </p>
+                </div>
+            </div>
+            <div class="cards-container three">
+                <div class="img-holder">
+                    <a href="#">View</a>
+                    <img src="Hebb_network.png" alt="" height="100%" width="100%">
+                </div>
+                <div class="card-text">
+                    <h4>a week wirh the apple watch</h4>
+                    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. 
+                        Asperiores praesentium cumque reprehenderit dolorum sapiente 
+                        expedita sint nostrum id. Quod harum alias cupiditate consequatur aut, 
+                        quia corporis recusandae quis sequi natus.
+                    </p>
+                </div>
+            </div>
+        </div>
+        -->
+        <div class="button">
+            <a href="" class="btn">view more </a>
+        </div>
+    </div>
+    <footer>
+        <div class="icons">
+            <div class="social">
+                <i class="fab fa-facebook"></i>
+                <i class="fab fa-twitter"></i>
+                <i class="fab fa-instagram"></i>
+                <i class="fab fa-linkedin"></i>
+                <i class="fab fa-youtube"></i>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 Techbaar, all rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
